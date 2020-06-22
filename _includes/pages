@@ -1,0 +1,7 @@
+{% for p in site.pages %}
+{% if p.name == "index.md" %}
+{% assign index = p %}
+{% elsif p.name == "capi.md" %}
+{% assign capi = p %}
+{% endif %}
+{% endfor %}

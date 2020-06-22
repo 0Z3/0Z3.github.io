@@ -1,0 +1,126 @@
+/* roboto-regular - latin */
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    src: url('/assets/fonts/roboto-v20-latin-regular.eot'); /* IE9 Compat Modes */
+    src: local('Roboto'), local('Roboto-Regular'),
+    url('/assets/fonts/roboto-v20-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+    url('/assets/fonts/roboto-v20-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+    url('/assets/fonts/roboto-v20-latin-regular.woff') format('woff'), /* Modern Browsers */
+    url('/assets/fonts/roboto-v20-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+    url('/assets/fonts/roboto-v20-latin-regular.svg#Roboto') format('svg'); /* Legacy iOS */
+}
+
+/* roboto-mono-regular - latin */
+@font-face {
+    font-family: 'Roboto Mono';
+    font-style: normal;
+    font-weight: 400;
+    src: url('/assets/fonts/roboto-mono-v7-latin-regular.eot'); /* IE9 Compat Modes */
+    src: local('Roboto Mono'), local('RobotoMono-Regular'),
+    url('/assets/fonts/roboto-mono-v7-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+    url('/assets/fonts/roboto-mono-v7-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+    url('/assets/fonts/roboto-mono-v7-latin-regular.woff') format('woff'), /* Modern Browsers */
+    url('/assets/fonts/roboto-mono-v7-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+    url('/assets/fonts/roboto-mono-v7-latin-regular.svg#RobotoMono') format('svg'); /* Legacy iOS */
+}
+
+$font-size: 14;
+$highlight-color: #AADDFF;
+$h-border-left-width: 32px;
+$h-border-right-width: 256px;
+$h-border-top-width: 1px;
+//$h-border-color: #6699FF;
+$h-border-color: #5588EE;
+
+body {
+    font-family: Roboto, sans-serif;
+    font-size: $font-size;
+    //background-color: #F9F9FF;
+    background-color: #FFFFFF;
+
+    dt {
+	float: left;
+	margin-right: 8px;
+	//max-width: 20%;
+	// font-weight: bold;
+    }
+
+    dd {
+	//color: grey;
+	//margin-left: 20%;
+	margin-bottom: .5em;
+    }
+
+    dd::after {
+	content: " ";
+	display: block;
+	clear: left;
+    }
+
+    h1 {
+	border-top: $h-border-top-width solid $h-border-color;
+	border-left: $h-border-left-width solid $h-border-color;
+	border-right: $h-border-right-width solid $h-border-color;
+	padding-left: 8px;
+    }
+    h2 {
+	border-top: $h-border-top-width solid $h-border-color;
+	border-left: $h-border-left-width solid $h-border-color;
+	border-right: $h-border-right-width solid $h-border-color;
+	padding-left: 8px;
+    }
+    h3 {
+	border-top: $h-border-top-width solid $h-border-color;
+	border-left: $h-border-left-width solid $h-border-color;
+	border-right: $h-border-right-width solid $h-border-color;
+	padding-left: 8px;
+    }
+    h4 {
+	border-top: $h-border-top-width solid $h-border-color;
+	border-left: $h-border-left-width solid $h-border-color;
+	border-right: $h-border-right-width solid $h-border-color;
+	padding-left: 8px;
+    }
+    h5 {
+	border-top: $h-border-top-width solid $h-border-color;
+	border-left: $h-border-left-width solid $h-border-color;
+	border-right: $h-border-right-width solid $h-border-color;
+	padding-left: 8px;
+    }
+    h6 {
+	border-top: $h-border-top-width solid $h-border-color;
+	border-left: $h-border-left-width solid $h-border-color;
+	border-right: $h-border-right-width solid $h-border-color;
+	padding-left: 8px;
+    }
+}
+
+div.highlighter-rouge {
+    display: inline-block;
+    font-family: Roboto Mono, monospace;
+    font-size: $font-size;
+    #background-image: linear-gradient(to right, $highlight-color, #F9F9FF);
+    border-left: 1px solid $highlight-color;
+    border-top: 8px solid $highlight-color;
+    padding-left: 8px;
+    margin-left: 48px;
+}
+
+code.highlighter-rouge {
+    font-family: Roboto Mono, monospace;
+    font-size: $font-size;
+    background-color: $highlight-color;
+}
+
+code.language-repl {
+    display: inline-block;
+    font-family: Roboto Mono, monospace;
+    font-size: $font-size;
+    #background-image: linear-gradient(to right, $highlight-color, #F9F9FF);
+    border-left: 1px solid $highlight-color;
+    border-top: 8px solid $highlight-color;
+    padding-left: 8px;
+    margin-left: 48px;
+}

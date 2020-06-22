@@ -1,0 +1,36 @@
+nav {
+    margin: 50px;
+    ul{
+	//display: inline-block;
+	//text-align: center;
+	list-style-type: none;
+	margin: 0;
+	padding-top: 10px;
+	text-align: center;
+    }
+    li {
+	display: inline-block;
+	width: 100px;
+	a {
+	    padding-left: 20px;
+	    padding-right: 20px;
+	    padding-top: 4px;
+	    padding-bottom: 4px;
+	    background-color: #000000;
+	    color: #dddddd;
+	}
+    }
+    
+    a:link {
+	text-decoration: inherit;
+	//color: inherit;
+    }
+    a:visited {
+	text-decoration: inherit;
+	//color: inherit;
+    }
+    a:hover {
+	text-decoration: none;
+	//color: inherit;
+    }
+}
