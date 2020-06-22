@@ -31,6 +31,13 @@ It is also available for [nodejs](https://nodejs.org)
 via [npm](https://npmjs.org): 
 [https://www.npmjs.com/package/osejs](https://www.npmjs.com/package/osejs)
 
+# Build
+
+To build the REPL, on Mac OS X or Linux, you should be able to cd to the 
+main directory and type `make debug`. To build the Javascript files,
+make sure have [emscripten](https://emscripten.org/) installed, and then
+you should be able to run `make js`.
+
 # Introduction
 
 Ose provides a few different interfaces for creating and manipulating OSC data.
