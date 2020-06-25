@@ -582,38 +582,187 @@ STACK:
 
 #### Strings and Blobs
 
-This section is underdeveloped, as the API for joining and splitting strings
-and blobs needs to be reviewed.
+Strings and blobs, unlike ints and floats, have variable length and can be 
+combined and split apart in few different ways. 
 
-##### Joining and Concatenation
+##### Concatenation
 
-Strings and blobs can be concatenated with `/!/concat/strings` and 
-`/!/concat/blobs`. Unlike many of the functions we've seen so far, these expect
-the two items to be joined to already be part of the same message.
+A string may be concatenated onto the end of another string, and similarly, 
+two blobs may be concatenated together. 
 ```repl
 # /s/hello
 STACK:
- [s:hello]
-# /s/ world
+ [s:hello ]
+# /s/world
 STACK:
- [s:hello]
- [s: world]
+ [s:hello ]
+ [s:world]
 # /!/push
 STACK:
- [s:hello][s: world]
+ [s:hello ][s:world]
 # /!/concat/strings
 STACK:
  [s:hello world]
 ```
-
-Joining works the same way, except that a string to be inserted between the 
-two strings to be joined should be placed on top of the stack.
+Similarly, for blobs:
 ```repl
+# /b/00010203
+STACK:
+ [b:<4:00010203>]
+# /b/04050607
+STACK:
+ [b:<4:00010203>]
+ [b:<4:04050607>]
+# /!/push
+STACK:
+ [b:<4:00010203>][b:<4:04050607>]
+# /!/concat/blobs
+STACK:
+ [b:<8:0001020304050607>]
 ```
 
-##### Splitting, Decatenation, and Trimming
+Note that unlike many of the functions we have
+seen so far that take more than one argument, these functions require the
+two items to be concatenated to be the two topmost items of the topmost
+message.
 
+##### Decatenation
 
+Decatenation is the opposite of concatenation; you supply a string or a blob,
+the number of bytes that should be decatenated, and whether those bytes should
+be counted forward from the beginning, or backward from the end.
+```repl
+# /s/hello world!
+STACK:
+ [s:hello world!]
+# /i/5
+STACK:
+ [s:hello world!]
+ [i:5]
+# /!/decat/string/fromstart
+STACK:
+ [s:hello][s: world!]
+# /i/6
+STACK:
+ [s:hello][s: world!]
+ [i:6]
+# /!/decat/string/fromend
+STACK:
+ [s:hello][s: ][s:world!]
+# /i/1
+STACK:
+ [s:hello][s: ][s:world!]
+ [i:1]
+# /!/decat/string/fromend
+STACK:
+ [s:hello][s: ][s:world][s:!]
+# /!/concat/strings
+STACK:
+ [s:hello][s: ][s:world!]
+# /!/concat/strings
+STACK:
+ [s:hello][s: world!]
+# /!/concat/strings
+STACK:
+ [s:hello world!]
+```
+
+`/!/decat/blob/fromstart` and `/!/decat/blob/fromend` work on blobs in exactly
+the same manner as the example above.
+
+##### Splitting
+
+Splitting is like decatenation, although instead of specifying the number of
+bytes to count into the string to find the point to make the split, you specify
+a *token*---a string of one or more characters---and whether to begin searching
+from the start or the end. The split will take place at the point where
+the first occurrence of that token was found.
+
+The split functions included here are intended to be used to split apart the 
+different components of an OSC address string, and so may behave differently
+than split functions in other languages. One notable difference is that they
+leave the token attached to the rightmost part of the string.
+```repl
+# /s//foo/bar/bloo
+STACK:
+ [s:/foo/bar/bloo]
+# /s//
+STACK:
+ [s:/foo/bar/bloo]
+ [s:/]
+# /!/split/string/fromstart
+STACK:
+ [s:/foo]
+ [s:/bar/bloo]
+ [s:/]
+```
+Notice also that the stack is left organized in such a way that the split
+function can be immediately applied to the remainder of the string to split
+it again.
+
+Splitting from the end works similarly:
+```repl
+# /s//foo/bar/bloo
+STACK:
+ [s:/foo/bar/bloo]
+# /s//
+STACK:
+ [s:/foo/bar/bloo]
+ [s:/]
+# /!/split/string/fromend
+STACK:
+ [s:/bloo]
+ [s:/foo/bar]
+ [s:/]
+```
+
+The split functions only work on strings, not blobs.
+
+##### Joining
+
+Two strings may be joined together with a separater, also a string. The stack 
+contain three elements, all messages, with the top two each containing only a 
+single string, the topmost being the separator. The join operation is 
+essentially:
+```repl
+/!/swap
+/!/push
+/!/push
+/!/concat/strings
+/!/concat/strings
+```
+```repl
+# /s/hello
+STACK:
+ [s:hello]
+# /s/world
+STACK:
+ [s:hello]
+ [s:world]
+# /s/
+STACK:
+ [s:hello]
+ [s:world]
+ [s: ]
+# /!/join/strings
+STACK:
+ [s:hello world]
+```
+
+##### Trimming
+
+Extra whitespace may be trimmed off the start or end of a string as follows:
+```repl
+# /s/   string with whitespace
+STACK:
+ [s:   string with whitespace  ]
+# /!/trim/string/end
+STACK:
+ [s:   string with whitespace]
+# /!/trim/string/start
+STACK:
+ [s:string with whitespace]
+```
 
 ##### String Comparison and Pattern Matching
 
