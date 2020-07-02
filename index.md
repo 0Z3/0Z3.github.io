@@ -116,26 +116,19 @@ by sending the message `/i/3`, what is really happening is that we are adding
 a message to the stack bundle that has an empty address field and a single 
 integer value.
 
-We can assign a value to an address by sending a message of the form
-`/@/<address>`, where `<address>` is the name we want to give the value.
-For example, if we would like to assign the 8 we have sitting on top of the 
-stack to the address `/myval`, we would send `/@/myval`. 
-
-The `/@` message doesn't just affect the topmost element on the stack---it
-reduces the entire stack to a single message with the address you supplied.
-For example, if we send the following sequence of messages
+We can give values an address and copy them into the environment by sending
+a message of the form `/@/<name>`, where `/name` is the address we would like
+to assign to. `/@` pushes all elements on the stack onto a single message, so
+the following sequence of messages
+```repl
+/i/10
+/f/3.14159
+/s/foo bar
+/@/thing
 ```
-/i/1
-/i/2
-/i/3
-/@/xyz
-```
-we will be left with a single message on the stack with the address `/xyz`
-and arguments 3, 2, 1.
-
-In addition to reducing and naming the elements on the stack, it also copies
-the newly constructed message into another bundle called the *environment*,
-replacing any message with the same address, if it exists.
+would push a message with address `/thing` into the environment, with arguments
+10, 3.14159, and "foo bar", and clear the stack. There are a number of ways
+to add entries to the environment which we will see later.
 
 ### Lookup
 
@@ -908,7 +901,7 @@ padding.
 `/size/tt`
 : get the size of the type tag string (or time tag) including any padding.
 
-### Quoting, Conditionals, Iteration, and `/!/eval`
+### Quoting, Abstraction, Evaluation, and Application
 
 #### Quoting
 
@@ -937,13 +930,14 @@ STACK:
 
 The eval(uate) function expects a bundle to be on top of the stack---either
 by itself as an element, or as a blob that is the topmost item in a 
-message. When sent, the eval function makes a copy of the current state
-of the stack, clears the stack, and then moves the bundle to the input
-and processes each element.
-Once the last element of the bundle is finished, the current state of the 
-stack is copied, the old state as it was before evaluation is restored,
-and the results of the evaluation are pushed onto the top of the stack as a 
-bundle.
+message. When sent, the eval function copies the current state of each of
+the bundles (the input, control, stack, and environment), and clears all
+of them except for the environment. It then moves the bundle that was on
+top of the stack into the input, and continues evaluation in this context
+as normal. When everything in that bundle has been processed, and the
+input and control bundles are empty, the original state of each
+of the bundles is restored, any results from the evaluation that were left
+on the stack are placed on top of the stack, and evaluation continues.
 ```repl
 # /'/i/3
 STACK:
@@ -965,9 +959,100 @@ STACK:
  #/!/add
 # /!/eval
 STACK:
-#bundle
- # [i:8]
+ [i:8]
 ```
+
+#### `/!/apply`
+
+Apply takes one or more arguments, with the first one being the function to 
+be applied to the rest of the elements on the stack. This first argument must
+ultimately resolve to a bundle which will be evaluated according to the 
+description of `/!/eval` above, or a blob containing a C function pointer,
+which we will discuss in the section on importing below. If it is a string,
+it will be looked up first in the environment, and then in the list of 
+builtin functions, so you may enter functions in the environment that 
+shadow builtin ones. If no entry is found in either place, the string is 
+simply left on top of the stack.
+
+There is nothing special about the structure of a bundle that will be passed
+as the first argument to apply; it will simply be evaluated as any other 
+bundle will be, and any local bindings that are performed will be wiped away
+when the evaluator restores the environment to its state prior to 
+performing the application.
+
+As an example, let's make a function that adds 1 to its argument:
+```repl
+# /lhs
+STACK:
+ [s:/lhs]
+# /'/!/assign
+STACK:
+ [s:/lhs]
+/!/assign
+# /'/$/lhs
+STACK:
+ [s:/lhs]
+/!/assign
+/$/lhs
+# /i/1
+STACK:
+ [s:/lhs]
+/!/assign
+/$/lhs
+ [i:1]
+# /'/!/add
+STACK:
+ [s:/lhs]
+/!/assign
+/$/lhs
+ [i:1]
+/!/add
+# /!/bundle/all
+STACK:
+#bundle
+ # [s:/lhs]
+ #/!/assign
+ #/$/lhs
+ # [i:1]
+ #/!/add
+ # /@/add1
+STACK:
+
+# /i/10
+STACK:
+ [i:10]
+# /!/add1
+STACK:
+ [i:11]
+```
+The assignment that happens at the beginning is unnecessary---it's just there 
+to show that assignment in a function is just ordinary assignment. We could
+have just as easily used the value on the stack directly:
+```repl
+# /i/1
+STACK:
+ [i:1]
+# /'/!/add
+STACK:
+ [i:1]
+/!/add
+# /!/bundle/all
+STACK:
+#bundle
+ # [i:1]
+ #/!/add
+ # /@/add1
+STACK:
+
+# /i/10
+STACK:
+ [i:10]
+# /!/add1
+STACK:
+ [i:11]
+```
+
+### Conditionals and Iteration
 
 #### Conditionals
 
@@ -1347,6 +1432,8 @@ some destination, you might send the environment somewhere, or reset it, etc.
 
 ### Hooks
 
+#### Server Message Hooks
+
 One of the more powerful aspects of the OSC Server / VM is that the functions
 that the VM runs in response to the server receiving the builtin messages
 (`/i`, `/f`, `/s`, `/b`, `/!`, `/@`, `/$`, and `/'`) are implemented as hooks
@@ -1359,7 +1446,11 @@ are followed by `/a/<int>` or `/d/<int>`, they will get or set the value of
 analog or digital pin number `<int>`, and if not, they will simply lookup 
 from or assign to the environment. 
 
-#### Assertions
+#### Pre- and Post-eval Hooks
+
+
+
+### Assertions
 
 ### Nonstandard Types
 
